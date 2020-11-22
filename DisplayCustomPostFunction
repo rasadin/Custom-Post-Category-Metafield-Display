@@ -1,0 +1,106 @@
+/**
+ * A function for latest events in home page
+ *  @author Rasadin
+ */
+function event_yes_in_home_page() { 
+	$the_query = new WP_Query( array(
+	'post_type' => 'events',
+	'posts_per_page' => 4,
+	));
+	
+	if ( $the_query->have_posts() ) : 
+		$return_html = '<div class="shb-home-page-post"> <div class="shb-post-middle-content" id="js-loadmore-post-appender">';
+		foreach( $the_query->posts as $post ): 
+			$categories = get_the_terms( $post->ID, 'event-cat' );
+
+
+			if($categories != ''){
+				$catList = '';
+				foreach($categories as $cat){
+					$category_id = $cat->term_id;
+					$category_name = $cat->name;
+					$category_link = get_category_link( $category_id );
+
+					if(!empty($catList)) {
+						$catList .= ' | ';
+					}
+					$catList .= '<a href="'.$category_link.'">'.$category_name.'</a>';
+				}
+			}
+
+
+			$no_image_link = get_template_directory_uri()."/assets/source/images/no-img.jpg";
+
+			$content = $post->post_content;
+			$text = strip_tags(substr($content, 0, 180));
+			$dotdot = "... ";
+
+
+			$read_content = get_post_field( 'post_content', $post->ID );
+			$word_count = str_word_count( strip_tags( $read_content ) );
+			$readingtime = ceil($word_count / 200);
+			if ($readingtime == 1) {
+				$timer = " minute";
+				} else {
+				$timer = " minutes";
+				}
+				$totalreadingtime = $readingtime . $timer;
+			
+
+			$meta_custom_date = get_post_meta($post->ID, 'date_of_event',true);
+			$custom_date = date("j F Y", strtotime($meta_custom_date));
+
+
+			if ( has_post_thumbnail($post->ID) ) {
+			$return_html .= '
+			<article id="post-'.$post->ID.'" class="shb-post-single-content js-masonary-item">
+				<div class="webalive-blogpost shb-latest-news">
+					<a href=" '.get_the_permalink($post->ID).'">
+						<div class="webalive-blogpost-picture"> '.get_the_post_thumbnail($post->ID).'</div>
+					</a>
+					<div class="webalive-blogpost-detail">
+						<h3 class="webalive-blogpost-title"> <a href=" '.get_the_permalink($post->ID).'">'. get_the_title($post->ID).'</a></h3>
+					</div>
+				</div>
+				<div class ="blog-time-read">
+				    <span class="webalive-blogpost-date">'.get_the_date('j F Y', $post->ID).'</span>
+					<span class="webalive-blogpost-read">'." . ".$totalreadingtime." read".'</span>
+					<span class="webalive-blogpost-cat">'." . ".$catList." Category ".'</span>
+				</div>
+
+				<div class="webalive-blogpost-content">'." Content: ".$text."...".'</div>
+				<div class="webalive-blogpost-metadate">'." Content: ".$custom_date." ".'</div>
+
+			</article>
+				'; 
+			}else{
+				$return_html .= '
+			<article id="post-'.$post->ID.'" class="shb-post-single-content js-masonary-item">
+				<div class="webalive-blogpost shb-latest-news">
+					<a href=" '.get_the_permalink($post->ID).'">
+						<div class="webalive-blogpost-picture"><img src="'.$no_image_link.'"/></div>
+					</a>
+					<div class="webalive-blogpost-detail">
+						<h3 class="webalive-blogpost-title"> <a href=" '.get_the_permalink($post->ID).'">'. get_the_title($post->ID).'</a></h3>
+					</div>
+				</div>
+				<div class ="blog-time-read">
+				    <span class="webalive-blogpost-date">'.get_the_date('j F Y', $post->ID).'</span>
+					<span class="webalive-blogpost-read">'." . ".$totalreadingtime." read".'</span>
+					<span class="webalive-blogpost-cat">'." . ".$catList." Category ".'</span>
+				</div>
+
+				<div class="webalive-blogpost-content">'." Content: ".$text."...".'</div>
+				<div class="webalive-blogpost-metadate">'." Content: ".$custom_date." ".'</div>
+
+
+			</article>
+				';
+			}
+		endforeach;
+	$return_html .= '</div></div>';
+	endif;
+	wp_reset_query();
+	return $return_html;
+}
+add_shortcode('event_for_home_page_shortcode', 'event_yes_in_home_page');
