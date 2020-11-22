@@ -48,7 +48,7 @@ function event_yes_in_home_page() {
 			
 
 			$meta_custom_date = get_post_meta($post->ID, 'date_of_event',true);
-			if($meta_custom_date != ''){
+			if($meta_custom_date == ''){
 				$custom_date = "No Date Available!";
 			}else{
 				$custom_date = date("j F Y", strtotime($meta_custom_date));
