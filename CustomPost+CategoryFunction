@@ -1,0 +1,55 @@
+// This code create custom post type
+function create_events_custom_post() {
+	$labels = array(
+	  'name'               => _x( 'Events', 'post type general name' ),
+	  'singular_name'      => _x( 'Event', 'post type singular name' ),
+	  'add_new'            => _x( 'Add New', 'event' ),
+	  'add_new_item'       => __( 'Add New Event' ),
+	  'edit_item'          => __( 'Edit Event' ),
+	  'new_item'           => __( 'New Event' ),
+	  'all_items'          => __( 'All Events' ),
+	  'view_item'          => __( 'View Event' ),
+	  'search_items'       => __( 'Search Events' ),
+	  'not_found'          => __( 'No event found' ),
+	  'not_found_in_trash' => __( 'No event found in the Trash' ), 
+	  'parent_item_colon'  => '',
+	  'menu_name'          => 'Events'
+	);
+	$args = array(
+	  'labels'        => $labels,
+	  'description'   => 'Holds events and event specific data',
+	  'public'        => true,
+	  'menu_position' => 5,
+	  'supports'      => array( 'title', 'editor','taxonomies', 'thumbnail', 'excerpt', 'comments' ),
+	  'has_archive'   => true,
+	);
+	register_post_type( 'events', $args ); 
+}
+add_action( 'init', 'create_events_custom_post' );
+// end--This code create custom post type
+  
+  
+// This code create Categories under custom post type
+function create_taxonomies_eventss_posttype() {
+	$labels = array(
+	  'name'              => _x( 'Events Categories', 'taxonomy general name' ),
+	  'singular_name'     => _x( 'Event Category', 'taxonomy singular name' ),
+	  'search_items'      => __( 'Search Event Categories' ),
+	  'all_items'         => __( 'All Events Categories' ),
+	  'parent_item'       => __( 'Parent Event Category' ),
+	  'parent_item_colon' => __( 'Parent Event Category:' ),
+	  'edit_item'         => __( 'Edit Event Category' ), 
+	  'update_item'       => __( 'Update Event Category' ),
+	  'add_new_item'      => __( 'Add New Event Category' ),
+	  'new_item_name'     => __( 'New Event Category' ),
+	  'menu_name'         => __( 'Event Categories' ),
+	  
+	);
+	$args = array(
+	  'labels' => $labels,
+	  'hierarchical' => true,
+	);
+	register_taxonomy( 'event-cat', 'events', $args );
+}
+add_action( 'init', 'create_taxonomies_eventss_posttype', 0 );
+// end--This code create Categories under custom post type
