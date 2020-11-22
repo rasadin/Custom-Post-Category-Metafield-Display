@@ -1,0 +1,42 @@
+function add_metabox_testimonials_designation() {
+	add_meta_box(
+		'events_date_metabox', // metabox ID, it also will be the HTML id attribute
+		'Event Date', // title
+		'events_date_display_metabox', // this is a callback function, which will print HTML of our metabox
+		'events', // post type or post types in array
+		'side', // position on the screen where metabox should be displayed (normal, side, advanced)
+		'default' // priority over another metaboxes on this page (default, low, high, core)
+	);
+}
+add_action( 'admin_menu', 'add_metabox_testimonials_designation' );
+
+function events_date_display_metabox( $post ) {
+	wp_nonce_field( basename( __FILE__ ), 'events_date_metabox_nonce' ); //needed for security reasons
+	//text field
+	$company_name = '<p><label>Date: <input type="date" data-date="" data-date-format="DD MMMM YYYY"  name="date_of_event" value="' . esc_attr( get_post_meta($post->ID, 'date_of_event',true) )  . '" /></label></p>';
+	echo $company_name;
+}
+
+
+function events_date_save_post_meta( $post_id, $post ) {
+	// Security checks
+	if ( !isset( $_POST['events_date_metabox_nonce'] ) 
+	|| !wp_verify_nonce( $_POST['events_date_metabox_nonce'], basename( __FILE__ ) ) )
+		return $post_id;
+	
+	//Check current user permissions
+	$post_type = get_post_type_object( $post->post_type );
+	if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+		return $post_id;
+	
+	// Do not save the data if autosave
+	if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
+		return $post_id;
+ 
+	if ($post->post_type == 'events') { // define your own post type here
+		update_post_meta($post_id, 'events_date_noindex', $_POST['events_date_noindex']);	
+		update_post_meta($post_id, 'date_of_event', sanitize_text_field( $_POST['date_of_event'] ) );
+	}
+	return $post_id;
+}
+add_action( 'save_post', 'events_date_save_post_meta', 10, 2 );
